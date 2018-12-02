@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+	<head>
+
+		<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+		<link rel="icon" href="../favicon.ico?v=2">
+
+		<title> Todo List </title>
+
+		<link href="../css/_third_party/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/_third_party/bootstrap-theme.min.css" rel="stylesheet">
+		<link href="../css/customNavbar.css" rel="stylesheet">
+		<link href="../css/text.css" rel="stylesheet">
+
+	</head>
+
+	<body>
+
+		<div id="headerNavbar"></div>
+
+		<div id="content"></div>
+
+		<script src="../js/_third_party/jquery.min.js"></script>
+		<script src="../js/_third_party/bootstrap.min.js"></script>
+		<script>
+
+    function loadPage(urlParams) {
+      var urlVariables = urlParams.split('&');
+      var urlParams = {}
+      for (i=0; i<urlVariables.length; i++) {
+        paramPair = urlVariables[i].split('=')
+        urlParams[paramPair[0]] = paramPair[1]
+      }
+
+      $('#headerNavbar').load('headerNavbar.html', function(){
+        if ('todo_type' in urlParams) {
+          if (document.getElementById(urlParams['todo_type']) != null) {
+            document.getElementById(urlParams['todo_type']).className += " on";
+          }
+        }
+      });
+
+			if (urlParams['todo_type'] == 'short_term' || urlParams['todo_type'] == 'long_term') {
+				$('#content').load('todo_list_items.html', function(){load_todo_list_items(urlParams['todo_type']);});
+			}
+    }
+
+    $(document).ready(function() {
+
+      var urlParams = decodeURIComponent(location.search);
+      if (urlParams == '') {
+        localStorage.clear();
+        urlParams = '?todo_type=short_term';
+      }
+      urlParams = urlParams.substring(1);
+      console.log(urlParams);
+
+      loadPage(urlParams);
+    });
+
+		</script>
+
+	</body>
+
+</html>

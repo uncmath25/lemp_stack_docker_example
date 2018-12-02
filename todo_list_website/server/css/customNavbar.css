@@ -1,0 +1,36 @@
+.navbar-custom {
+  background-color: #404040;
+  border-color: #404040;
+}
+
+.nav-dropdown-header:hover .dropdown-menu {
+  display: block;
+}
+
+.navbar-custom .navbar-toggle {
+  background-color: #404040;
+  border-color: #000000;
+}
+
+.navbar-custom .navbar-nav > li > a {
+  color: #ffffff;
+  padding-bottom: 30px;
+  padding-left:10px;
+  padding-right:50px;
+}
+.navbar-custom .navbar-nav > li > a:hover {
+  background-color: #606060;
+}
+
+.navbar-custom-label {
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+.navbar-dropdown-label {
+  font-size: 1.2em;
+}
+
+.on {
+  background-color: #808080;
+}

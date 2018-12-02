@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12 col-lg-8 col-lg-offset-2">
+      <div class="table-responsive">
+        <table id='todo-list-items-table' class="table table-striped table-hover table-bordered"><tbody/></table>
+      </div>
+    </div>
+    <div class="col-lg-2"></div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12" style="padding: 20px;"></div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 col-lg-8 col-lg-offset-2" style="height: 40px; padding: 20px;">
+      <div id="item-notification"/>
+    </div>
+    <div class="col-lg-2"></div>
+  </div>
+</div>
+
+<script>
+  var todo_type;
+
+  function delete_todo_items(delete_ids) {
+    var delete_ids_wrapper = {'todo_type': todo_type, 'delete_ids': delete_ids};
+    $.ajax({ url: "../php/delete_todo_list_items.php",
+              type: 'POST',
+              dataType: 'text',
+              data: delete_ids_wrapper,
+              success: function(response, textStatus, jqXHR) {
+                $('#item-notification').empty();
+                $('#item-notification').append('\
+                <div class="alert alert-danger"> \
+                  <strong>Item was deleted!</strong> \
+                </div>');
+                var item_notification = setInterval(function(){$('#item-notification').empty(); clearInterval(item_notification);}, 3000);
+                get_todo_list_items();
+              },
+              error: function(jqXHR, textStatus, errorThrown){
+                alert(textStatus, errorThrown);
+              }
+    });
+  }
+
+  function create_todo_items(new_item_names) {
+    var new_item_names_wrapper = {'todo_type': todo_type, 'new_item_names': new_item_names};
+    $.ajax({ url: "../php/create_todo_list_items.php",
+              type: 'POST',
+              dataType: 'text',
+              data: new_item_names_wrapper,
+              success: function(response, textStatus, jqXHR) {
+                $('#deletion-notification').empty();
+                $('#deletion-notification').append('\
+                <div class="alert alert-success"> \
+                  <strong>Item was added!</strong> \
+                </div>');
+                var item_notification = setInterval(function(){$('#item-notification').empty(); clearInterval(item_notification);}, 3000);
+                console.log(response);
+                get_todo_list_items();
+              },
+              error: function(jqXHR, textStatus, errorThrown){
+                alert(textStatus, errorThrown);
+              }
+    });
+  }
+
+  function set_deletion_handler(item_id) {
+    $('#item-row-' + item_id + '-button').click(function(){
+      console.log(item_id)
+      delete_todo_items([{'item_id': item_id}]);
+    });
+  }
+
+  function set_creation_handler() {
+    $('#new-item').empty();
+    $('#new-item').append('\
+      <td id="new-item-text" class="content-text" style="width: 90%; text-align: center;"></td> \
+      <td style="width: 10%; text-align: center;"> \
+        <button id="new-item-button"> \
+          + \
+        </button> \
+      </td>');
+    $('#new-item-text')[0].setAttribute('contenteditable', 'true');
+    $('#new-item-button').click(function(){
+      create_todo_items([{'item_name': $.trim($('#new-item-text').text())}]);
+    });
+    $('#new-item-text').focus();
+  }
+
+  function build_todo_list_table(todo_list_items) {
+    $('#todo-list-items-table tbody').empty();
+    for (var i = 0; i < todo_list_items.length; i++) {
+      var item_row = todo_list_items[i];
+      var item_name = todo_list_items[i]['item_name'];
+      $('#todo-list-items-table tbody').append('\
+        <tr id="item-row-' + item_row['item_id'] + '"> \
+          <td class="content-text" style="width: 90%; text-align: center;">' + item_row['item_name'] + '</td> \
+          <td style="width: 10%; text-align: center;"> \
+            <button id="item-row-' + item_row['item_id'] + '-button"> \
+              <span> \
+                <img id="item-row-' + item_row['item_id'] + '-image" src="../img/glyphs/checkmark_green_16.png" aria-hidden="true"/> \
+              </span> \
+            </button> \
+          </td> \
+        </tr>');
+      set_deletion_handler(item_row['item_id']);
+    }
+    $('#todo-list-items-table tbody').append('\
+      <tr id="new-item"> \
+        <td style="width: 100%; text-align: center;"> \
+          <button id="new-item-button"> \
+            + \
+          </button> \
+        </td> \
+      </tr>');
+      $('#new-item-button').click(function(){
+        set_creation_handler();
+      });
+  }
+
+  function get_todo_list_items() {
+    $.ajax({ url: '../php/get_todo_list_items.php?todo_type=' + todo_type,
+              type: 'GET',
+              dataType: 'json',
+              success: function(result){
+                build_todo_list_table(result['todo_list_items']);
+              },
+              error: function(){
+                alert('Get Todo List Items Error...');
+              }
+    });
+  }
+
+  function load_todo_list_items(input_todo_type) {
+    todo_type = input_todo_type;
+    get_todo_list_items();
+  }
+</script>
