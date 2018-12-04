@@ -1,0 +1,25 @@
+version: "3"
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: nginx_dockerfile.conf
+    ports:
+      - '80:80'
+  phpfpm:
+    container_name: phpfpm
+    build:
+      context: .
+      dockerfile: php_dockerfile.conf
+  db:
+    container_name: mysql
+    build:
+      context: .
+      dockerfile: mysql_dockerfile.conf
+    environment:
+      MYSQL_ROOT_PASSWORD: "password"
+    volumes:
+      - practice-db:/var/lib/mysql
+volumes:
+  practice-db:

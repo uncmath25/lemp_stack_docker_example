@@ -1,16 +1,26 @@
-.PHONY: run
+.PHONY: stop reset run deploy
+
+stop:
+	@echo "*** Stopping all project docker containers ***"
+	docker-compose -f ./docker-compose-dev.yml down
+	docker-compose -f ./docker-compose-prod.yml down
+
+reset: stop
+	@echo "*** Removing the project database ***"
+	docker volume rm -f lemp_stack_docker_example_practice-db
+
 run:
+	@echo "*** Running the project locally ***"
 	rm -rf logs/*
 	mkdir -p logs
 	touch logs/access.log logs/error.log
-	docker-compose down
-	docker-compose up --build -d
+	docker-compose -f ./docker-compose-dev.yml down
+	docker-compose -f ./docker-compose-dev.yml up --build -d
 
-.PHONY: stop
-stop:
-	docker-compose down
-
-.PHONY: reset
-reset:
-	docker-compose down
-	docker volume rm -f lemp_stack_example_practice-db
+deploy:
+	@echo "*** Deploying the project ***"
+	rm -rf logs/*
+	mkdir -p logs
+	touch logs/access.log logs/error.log logs/docker.log
+	docker-compose -f ./docker-compose-prod.yml down
+	docker-compose -f ./docker-compose-prod.yml up --build > ./logs/docker.log 2>&1 &
